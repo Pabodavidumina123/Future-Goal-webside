@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #030712; /* Slate-950 */
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(30, 41, 59, 0.3) 0, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.08) 0, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0, transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+/* Premium Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.6); /* Slate-900 with opacity */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px 0px rgba(99, 102, 241, 0.1);
+  transform: translateY(-4px);
+}
+
+.glass-input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(99, 102, 241, 0.5);
+  outline: none;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* Custom animations and glowing elements */
+.glow-indigo {
+  box-shadow: 0 0 40px -5px rgba(99, 102, 241, 0.2);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 40px -5px rgba(16, 185, 129, 0.2);
+}
+
+/* Status dots glow */
+.glow-dot-pending {
+  box-shadow: 0 0 8px 1px rgba(245, 158, 11, 0.5);
+}
+
+.glow-dot-approved {
+  box-shadow: 0 0 8px 1px rgba(16, 185, 129, 0.5);
+}
+
+.glow-dot-rejected {
+  box-shadow: 0 0 8px 1px rgba(239, 68, 68, 0.5);
+}
