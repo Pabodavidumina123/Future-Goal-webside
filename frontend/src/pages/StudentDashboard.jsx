@@ -89,13 +89,31 @@ const StudentDashboard = () => {
   return (
     <div className="space-y-8 animate-fade-in text-left">
       {/* Visual Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-          Welcome back, {user?.name}!
-        </h1>
-        <p className="text-xs text-slate-400 font-medium leading-none">
-          Manage your registrations, view admission approvals, and track career programs.
-        </p>
+      <div className="space-y-4">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+              Welcome back, {user?.name}!
+            </h1>
+            <p className="text-xs text-slate-400 font-medium leading-none">
+              Manage your registrations, view admission approvals, and track career programs.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-4 flex items-center gap-4 max-w-md">
+            <img
+              src={user?.profileImage || `https://ui-avatars.com/api/?background=2A4365&color=fff&name=${encodeURIComponent(user?.name || 'User')}`}
+              alt="Profile"
+              className="h-14 w-14 rounded-full object-cover border border-indigo-500/20"
+            />
+            <div>
+              <p className="text-sm font-bold text-slate-100">{user?.name}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500 font-semibold">
+                {user?.role === 'admin' ? 'Admin' : 'Student'}
+              </p>
+              <p className="text-xs text-slate-400">{user?.phone || 'No contact phone added'}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Metric KPIs Grid */}

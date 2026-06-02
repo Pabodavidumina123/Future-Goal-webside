@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 
 const instructorSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  role: { type: String, required: true },
-  bio: { type: String, required: true },
-  image: { type: String, required: true }
+  name: { type: String, required: [true, 'Please add an instructor name'] },
+  email: { type: String, required: [true, 'Please add an instructor email'] },
+  phone: { type: String, required: [true, 'Please add an instructor phone number'] },
+  bio: { type: String, required: [true, 'Please add instructor bio'] },
+  image: { type: String, required: [true, 'Please add an instructor image URL'] },
 });
 
 const courseSchema = new mongoose.Schema(
@@ -14,46 +15,101 @@ const courseSchema = new mongoose.Schema(
       required: [true, 'Please add a course title'],
       unique: true,
     },
+    category: {
+      type: String,
+      required: [true, 'Please add a course category'],
+    },
     description: {
       type: String,
       required: [true, 'Please add a course description'],
     },
-    image: {
-      type: String,
-      required: [true, 'Please add a course image URL'],
-    },
-    category: {
-      type: String,
-      required: [true, 'Please add a category'],
-    },
     duration: {
       type: String,
-      required: [true, 'Please add a duration'],
+      required: [true, 'Please add a course duration'],
     },
     fee: {
       type: Number,
       required: [true, 'Please add a course fee in LKR'],
     },
-    learningOutcomes: {
-      type: [String],
-      default: [],
+    level: {
+      type: String,
+      enum: ['Beginner', 'Intermediate', 'Advanced'],
+      required: [true, 'Please add a course level'],
     },
-    instructor: {
-      type: instructorSchema,
-      required: true,
+    image: {
+      type: String,
+      required: [true, 'Please add a course image URL'],
+    },
+    organization: {
+      type: String,
+      required: [true, 'Please add the organization/institute name'],
+    },
+    contactNumber: {
+      type: String,
+      required: [true, 'Please add a contact number'],
+    },
+    email: {
+      type: String,
+      required: [true, 'Please add a contact email address'],
+    },
+    website: {
+      type: String,
+      required: [true, 'Please add a website URL'],
+    },
+    startDate: {
+      type: Date,
+      required: [true, 'Please add a course start date'],
+    },
+    endDate: {
+      type: Date,
+      required: [true, 'Please add a course end date'],
+    },
+    schedule: {
+      type: String,
+      required: [true, 'Please add a course schedule'],
+    },
+    location: {
+      type: String,
+      required: [true, 'Please add the course location'],
+    },
+    totalSeats: {
+      type: Number,
+      required: [true, 'Please specify total seats'],
+      min: [1, 'Total seats must be at least 1'],
+    },
+    availableSeats: {
+      type: Number,
+      required: [true, 'Please specify available seats'],
+      min: [0, 'Available seats cannot be negative'],
+      default: 0,
+      validate: {
+        validator: function (value) {
+          return value <= this.totalSeats;
+        },
+        message: 'Available seats cannot exceed total seats',
+      },
     },
     requirements: {
       type: [String],
       default: [],
     },
-    availableSeats: {
-      type: Number,
-      required: [true, 'Please specify available seats'],
-      default: 30,
+    learningOutcomes: {
+      type: [String],
+      default: [],
     },
-    startDate: {
-      type: Date,
-      required: [true, 'Please add a course start date'],
+    status: {
+      type: String,
+      enum: ['Active', 'Inactive'],
+      default: 'Active',
+    },
+    instructor: {
+      type: instructorSchema,
+      required: true,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
     },
   },
   {

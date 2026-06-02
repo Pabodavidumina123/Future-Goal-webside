@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext();
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   // Fetch all notifications
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const res = await api.get('/notifications');
       if (res.data.success) {
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Error fetching notifications:', err);
     }
-  };
+  }, []);
 
   // Register User
   const register = async (name, email, password) => {
@@ -142,6 +142,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -156,6 +160,7 @@ export const AuthProvider = ({ children }) => {
         fetchNotifications,
         markNotificationRead,
         markAllNotificationsRead,
+        updateUser,
       }}
     >
       {children}

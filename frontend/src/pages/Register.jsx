@@ -5,7 +5,7 @@ import { Mail, Lock, Eye, EyeOff, User as UserIcon, ArrowRight } from 'lucide-re
 import Toast from '../components/Common/Toast';
 
 const Register = () => {
-  const { register } = useAuth();
+  const { register, user, logout } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,8 +75,21 @@ const Register = () => {
           </p>
         </div>
 
-        {/* Card */}
-        <div className="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-800/80">
+        {user ? (
+          <div className="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-800/80 text-center">
+            <h2 className="text-xl font-bold text-white">Already signed in</h2>
+            <p className="text-sm text-slate-400 mt-3">
+              You are currently logged in as <span className="font-semibold text-slate-100">{user.name}</span>. To create a new student account, please log out first.
+            </p>
+            <button
+              onClick={logout}
+              className="mt-6 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold uppercase tracking-wider text-white hover:bg-indigo-500 transition-colors"
+            >
+              Log out and register
+            </button>
+          </div>
+        ) : (
+          <div className="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-800/80">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div className="space-y-1.5 text-left">
@@ -176,6 +189,7 @@ const Register = () => {
             </Link>
           </div>
         </div>
+      )}
       </div>
 
       {/* Toast */}

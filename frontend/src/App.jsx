@@ -1,11 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Courses from './pages/Courses';
 import CourseDetails from './pages/CourseDetails';
 import StudentDashboard from './pages/StudentDashboard';
+import Profile from './pages/Profile';
+import MyCourses from './pages/MyCourses';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminContactRequests from './pages/AdminContactRequests';
 import Notifications from './pages/Notifications';
@@ -34,14 +36,18 @@ const AdminRoute = ({ children }) => {
 // 3. Public-Only Routes (Redirects if already logged in)
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
+
   if (loading) return <Spinner fullScreen />;
-  if (user) {
+
+  if (user && location.pathname !== '/register') {
     return user.role === 'admin' ? (
       <Navigate to="/admin" replace />
     ) : (
       <Navigate to="/courses" replace />
     );
   }
+
   return children;
 };
 
@@ -115,7 +121,26 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Profile />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-courses"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <MyCourses />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/notifications"
             element={
@@ -151,6 +176,19 @@ const App = () => {
           />
 
           {/* Redirects */}
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to={
+                  localStorage.getItem('token')
+                    ? '/courses'
+                    : '/login'
+                }
+                replace
+              />
+            }
+          />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

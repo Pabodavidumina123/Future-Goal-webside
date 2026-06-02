@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { BookOpen, GraduationCap, LayoutDashboard, Settings, HelpCircle, FileCheck } from 'lucide-react';
+import { BookOpen, GraduationCap, LayoutDashboard, Settings, HelpCircle, FileCheck, ShieldAlert, User as UserIcon } from 'lucide-react';
 
 const Sidebar = () => {
   const { user } = useAuth();
@@ -78,6 +78,28 @@ const Sidebar = () => {
             >
               <GraduationCap className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
               <span>My Dashboard</span>
+            </NavLink>
+
+            {/* Profile */}
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `${baseLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
+              }
+            >
+              <UserIcon className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Profile</span>
+            </NavLink>
+
+            {/* My Courses */}
+            <NavLink
+              to="/my-courses"
+              className={({ isActive }) =>
+                `${baseLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
+              }
+            >
+              <BookOpen className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>My Courses</span>
             </NavLink>
 
             {/* Notifications */}

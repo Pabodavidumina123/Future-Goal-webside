@@ -208,10 +208,22 @@ const CourseDetails = () => {
             <span className="absolute top-6 left-6 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-indigo-600/90 text-slate-100 backdrop-blur-sm shadow-md">
               {course.category}
             </span>
+            {course.availableSeats <= 0 && (
+              <span className="absolute top-6 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-600/90 text-white shadow-lg">
+                Full Course
+              </span>
+            )}
           </div>
 
           {/* Heading details */}
           <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.3em] text-slate-500 font-semibold">
+              <span className="rounded-full bg-slate-900/70 px-3 py-1">{course.level || 'General'}</span>
+              <span className="rounded-full bg-slate-900/70 px-3 py-1">{course.organization}</span>
+              <span className={`rounded-full px-3 py-1 ${course.status === 'Active' ? 'bg-emerald-500/10 text-emerald-300' : 'bg-amber-500/10 text-amber-300'}`}>
+                {course.status}
+              </span>
+            </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
               {course.title}
             </h1>
@@ -278,9 +290,25 @@ const CourseDetails = () => {
                   <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4 text-emerald-400" />{formattedDate}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-slate-800/60">
+                  <span className="text-slate-500">Course Level</span>
+                  <span className="flex items-center gap-1.5"><BookOpen className="h-4 w-4 text-slate-400" />{course.level}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-slate-800/60">
                   <span className="text-slate-500">Available Slots</span>
                   <span className="flex items-center gap-1.5"><Users className="h-4 w-4 text-indigo-400" />{course.availableSeats} Seats left</span>
                 </div>
+                <div className="flex justify-between items-center py-2 border-b border-slate-800/60">
+                  <span className="text-slate-500">Contact</span>
+                  <a href={`tel:${course.contactNumber}`} className="text-slate-200 hover:text-indigo-300">{course.contactNumber}</a>
+                </div>
+                {course.website && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-500">Website</span>
+                    <a href={course.website} target="_blank" rel="noreferrer" className="text-slate-200 hover:text-indigo-300">
+                      Visit
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 

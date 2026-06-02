@@ -2,6 +2,7 @@ import Registration from '../models/Registration.js';
 import Course from '../models/Course.js';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
+import { sendEnrollmentEmail } from '../services/emailService.js';
 
 // @desc    Create a new course registration
 // @route   POST /api/registrations
@@ -19,13 +20,11 @@ export const createRegistration = async (req, res) => {
       additionalNotes,
     } = req.body;
 
-    // Check if course exists
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
 
-    // Check if student is already registered for this course
     const alreadyRegistered = await Registration.findOne({
       student: req.user._id,
       course: courseId,
@@ -38,12 +37,16 @@ export const createRegistration = async (req, res) => {
       });
     }
 
-    // Check if seats are available
     if (course.availableSeats <= 0) {
       return res.status(400).json({ success: false, message: 'No seats available for this course' });
     }
 
-    // Create registration
+    course.availableSeats -= 1;
+    if (course.availableSeats <= 0) {
+      course.status = 'Inactive';
+    }
+    await course.save();
+
     const registration = await Registration.create({
       student: req.user._id,
       course: courseId,
@@ -57,14 +60,12 @@ export const createRegistration = async (req, res) => {
       status: 'pending',
     });
 
-    // Create student notification
     await Notification.create({
       recipient: req.user._id,
       message: `Your registration request for "${course.title}" was submitted successfully and is pending admin approval.`,
       type: 'info',
     });
 
-    // Create admin notification (for all admins)
     const admins = await User.find({ role: 'admin' });
     for (const admin of admins) {
       await Notification.create({
@@ -72,6 +73,12 @@ export const createRegistration = async (req, res) => {
         message: `New student registration request from ${fullName} for "${course.title}".`,
         type: 'warning',
       });
+    }
+
+    try {
+      await sendEnrollmentEmail(req.user, course, registration);
+    } catch (emailError) {
+      console.warn('Enrollment email could not be sent:', emailError.message);
     }
 
     res.status(201).json({
@@ -92,15 +99,13 @@ export const getRegistrations = async (req, res) => {
     let registrations;
 
     if (req.user.role === 'admin') {
-      // Admin gets all registrations, populated with details
       registrations = await Registration.find()
         .populate('student', 'name email')
-        .populate('course', 'title image category fee startDate availableSeats')
+        .populate('course', 'title image category fee startDate availableSeats status description contactNumber email schedule location')
         .sort('-createdAt');
     } else {
-      // Student gets their own registrations
       registrations = await Registration.find({ student: req.user._id })
-        .populate('course', 'title image category duration fee startDate availableSeats')
+        .populate('course', 'title image category duration fee startDate availableSeats status description contactNumber email schedule location')
         .sort('-createdAt');
     }
 
@@ -115,7 +120,7 @@ export const getRegistrations = async (req, res) => {
 // @access  Private/Admin
 export const updateRegistrationStatus = async (req, res) => {
   try {
-    const { status } = req.body; // 'approved' or 'rejected'
+    const { status } = req.body;
 
     if (!['approved', 'rejected', 'pending'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status type' });
@@ -135,23 +140,26 @@ export const updateRegistrationStatus = async (req, res) => {
 
     const course = await Course.findById(registration.course._id);
 
-    // If status changes to approved, decrement seats
-    if (status === 'approved' && oldStatus !== 'approved') {
-      if (course && course.availableSeats > 0) {
-        course.availableSeats -= 1;
+    if (status === 'rejected' && oldStatus !== 'rejected') {
+      if (course) {
+        course.availableSeats += 1;
+        if (course.availableSeats > 0) {
+          course.status = 'Active';
+        }
         await course.save();
       }
     }
 
-    // If status changes from approved to something else, increment seats
     if (oldStatus === 'approved' && status !== 'approved') {
       if (course) {
         course.availableSeats += 1;
+        if (course.availableSeats > 0) {
+          course.status = 'Active';
+        }
         await course.save();
       }
     }
 
-    // Create notification for student
     const statusMsg = status === 'approved' ? 'APPROVED 🎉' : 'REJECTED ❌';
     const alertType = status === 'approved' ? 'success' : 'error';
     await Notification.create({
@@ -181,13 +189,13 @@ export const deleteRegistration = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Registration record not found' });
     }
 
-    // If deleting an approved registration, restore the seat
-    if (registration.status === 'approved') {
-      const course = await Course.findById(registration.course);
-      if (course) {
-        course.availableSeats += 1;
-        await course.save();
+    const course = await Course.findById(registration.course);
+    if (course) {
+      course.availableSeats += 1;
+      if (course.availableSeats > 0) {
+        course.status = 'Active';
       }
+      await course.save();
     }
 
     await Registration.findByIdAndDelete(req.params.id);
