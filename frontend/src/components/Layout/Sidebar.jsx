@@ -34,7 +34,7 @@ const Sidebar = () => {
               <span>Admin Portal</span>
             </NavLink>
 
-            {/* Courses Catalog (Management Overview) */}
+            {/* Course Catalog */}
             <NavLink
               to="/courses"
               className={({ isActive }) =>
@@ -43,6 +43,17 @@ const Sidebar = () => {
             >
               <BookOpen className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Course Catalog</span>
+            </NavLink>
+
+            {/* Contact Request Queue */}
+            <NavLink
+              to="/admin/contacts"
+              className={({ isActive }) =>
+                `${baseLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
+              }
+            >
+              <ShieldAlert className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Contact Requests</span>
             </NavLink>
           </>
         ) : (
@@ -67,6 +78,17 @@ const Sidebar = () => {
             >
               <GraduationCap className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
               <span>My Dashboard</span>
+            </NavLink>
+
+            {/* Notifications */}
+            <NavLink
+              to="/notifications"
+              className={({ isActive }) =>
+                `${baseLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
+              }
+            >
+              <ShieldAlert className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Notifications</span>
             </NavLink>
           </>
         )}

@@ -10,6 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
 import registrationRoutes from './routes/registrationRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import contactRequestRoutes from './routes/contactRequestRoutes.js';
 
 // Models for Auto Seed
 import User from './models/User.js';
@@ -39,6 +40,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/contact-requests', contactRequestRoutes);
 
 // Base route for API Health
 app.get('/api/health', (req, res) => {

@@ -7,7 +7,7 @@ import Toast from '../components/Common/Toast';
 import Modal from '../components/Common/Modal';
 import CourseCard from '../components/CourseCard';
 import confetti from 'canvas-confetti';
-import { Calendar, Clock, DollarSign, Users, Award, BookOpen, User as UserIcon, CheckCircle2, ChevronLeft, ArrowRight, Phone, MapPin, GraduationCap } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Users, Award, BookOpen, User as UserIcon, CheckCircle2, ChevronLeft, ArrowRight, Phone, MapPin, GraduationCap, Mail, MessageCircle } from 'lucide-react';
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -32,6 +32,11 @@ const CourseDetails = () => {
   const [dob, setDob] = useState('');
   const [educationLevel, setEducationLevel] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
+
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactLoading, setContactLoading] = useState(false);
 
   const triggerToast = (msg, type = 'success') => {
     setToastMsg(msg);
@@ -114,6 +119,37 @@ const CourseDetails = () => {
       triggerToast(err.response?.data?.message || 'Registration failed. Try again.', 'error');
     } finally {
       setSubmitLoading(false);
+    }
+  };
+
+  const handleContactRequestSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!fullName || !email || !contactPhone) {
+      triggerToast('Please enter name, email, and phone to request contact.', 'error');
+      return;
+    }
+
+    setContactLoading(true);
+    try {
+      const res = await api.post('/contact-requests', {
+        courseId: id,
+        name: fullName,
+        email,
+        phone: contactPhone,
+        message: contactMessage,
+      });
+
+      if (res.data.success) {
+        triggerToast('Your contact request has been submitted. Admin will review it shortly.', 'success');
+        setContactModalOpen(false);
+        setContactPhone('');
+        setContactMessage('');
+      }
+    } catch (err) {
+      triggerToast(err.response?.data?.message || 'Unable to submit contact request.', 'error');
+    } finally {
+      setContactLoading(false);
     }
   };
 
@@ -253,21 +289,33 @@ const CourseDetails = () => {
               <div className="text-center py-3 bg-indigo-950/20 rounded-xl border border-indigo-900/30 text-xs font-bold text-indigo-300">
                 Logged in as Admin Overview
               </div>
-            ) : course.availableSeats <= 0 ? (
-              <button
-                disabled
-                className="w-full py-4 bg-rose-950/50 border border-rose-900/30 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-rose-300 cursor-not-allowed text-center"
-              >
-                Registration Closed (Full)
-              </button>
             ) : (
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-2xl text-xs font-extrabold uppercase tracking-widest shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-95 transition-all"
-              >
-                <span>Register Now</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="space-y-3">
+                {course.availableSeats > 0 ? (
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-2xl text-xs font-extrabold uppercase tracking-widest shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-95 transition-all"
+                  >
+                    <span>Register Now</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full py-4 bg-rose-950/50 border border-rose-900/30 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-rose-300 cursor-not-allowed text-center"
+                  >
+                    Registration Closed (Full)
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setContactModalOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 border border-slate-700 text-slate-200 rounded-2xl text-xs font-extrabold uppercase tracking-widest hover:bg-slate-800 transition-all"
+                >
+                  <MessageCircle className="h-4 w-4 text-indigo-400" />
+                  <span>Request Contact</span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -446,6 +494,75 @@ const CourseDetails = () => {
           >
             {submitLoading ? 'Submitting Application...' : 'Submit Admission Request'}
           </button>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={contactModalOpen}
+        onClose={() => setContactModalOpen(false)}
+        title="Request Course Contact"
+      >
+        <form onSubmit={handleContactRequestSubmit} className="space-y-5 text-left">
+          <div className="grid grid-cols-1 gap-4">
+            <label className="space-y-2 text-xs text-slate-400 uppercase tracking-wider">
+              Full Name
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200"
+                required
+              />
+            </label>
+            <label className="space-y-2 text-xs text-slate-400 uppercase tracking-wider">
+              Email Address
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200"
+                required
+              />
+            </label>
+            <label className="space-y-2 text-xs text-slate-400 uppercase tracking-wider">
+              Phone Number
+              <input
+                type="tel"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="0771234567"
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200"
+                required
+              />
+            </label>
+            <label className="space-y-2 text-xs text-slate-400 uppercase tracking-wider">
+              Message (Optional)
+              <textarea
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                rows={4}
+                placeholder="Ask for organization contact details, study plan, or admission guidance."
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 resize-none"
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-3 justify-end">
+            <button
+              type="button"
+              onClick={() => setContactModalOpen(false)}
+              className="rounded-2xl border border-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-300 hover:bg-slate-900 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={contactLoading}
+              className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-indigo-500 transition-colors"
+            >
+              <Mail className="h-4 w-4" />
+              {contactLoading ? 'Sending...' : 'Send Request'}
+            </button>
+          </div>
         </form>
       </Modal>
 

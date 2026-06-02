@@ -7,6 +7,8 @@ import Courses from './pages/Courses';
 import CourseDetails from './pages/CourseDetails';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminContactRequests from './pages/AdminContactRequests';
+import Notifications from './pages/Notifications';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
@@ -114,6 +116,17 @@ const App = () => {
             }
           />
 
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Notifications />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin Protected Dashboard */}
           <Route
             path="/admin"
@@ -121,6 +134,17 @@ const App = () => {
               <AdminRoute>
                 <AppLayout>
                   <AdminDashboard />
+                </AppLayout>
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/contacts"
+            element={
+              <AdminRoute>
+                <AppLayout>
+                  <AdminContactRequests />
                 </AppLayout>
               </AdminRoute>
             }
