@@ -45,6 +45,17 @@ const Sidebar = () => {
               <span>Course Catalog</span>
             </NavLink>
 
+            {/* Course Management */}
+            <NavLink
+              to="/admin/courses"
+              className={({ isActive }) =>
+                `${baseLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
+              }
+            >
+              <FileText className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Manage Courses</span>
+            </NavLink>
+
             {/* Contact Request Queue */}
             <NavLink
               to="/admin/contacts"
@@ -67,6 +78,16 @@ const Sidebar = () => {
             >
               <BookOpen className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Browse Courses</span>
+            </NavLink>
+
+            <NavLink
+              to="/dashboard/courses"
+              className={({ isActive }) =>
+                `${baseLinkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
+              }
+            >
+              <BookOpen className="h-5 w-5 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Explore Courses</span>
             </NavLink>
 
             {/* Student Dashboard */}

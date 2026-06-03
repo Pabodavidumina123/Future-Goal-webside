@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const instructorSchema = new mongoose.Schema({
   name: { type: String, required: [true, 'Please add an instructor name'] },
+  role: { type: String, required: [true, 'Please add an instructor role'] },
   email: { type: String, required: [true, 'Please add an instructor email'] },
   phone: { type: String, required: [true, 'Please add an instructor phone number'] },
   bio: { type: String, required: [true, 'Please add instructor bio'] },
@@ -82,12 +83,6 @@ const courseSchema = new mongoose.Schema(
       required: [true, 'Please specify available seats'],
       min: [0, 'Available seats cannot be negative'],
       default: 0,
-      validate: {
-        validator: function (value) {
-          return value <= this.totalSeats;
-        },
-        message: 'Available seats cannot exceed total seats',
-      },
     },
     requirements: {
       type: [String],

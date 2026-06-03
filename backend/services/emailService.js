@@ -1,8 +1,11 @@
+import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 
-const createTransporter = () => {
+dotenv.config();
+
+const getTransporter = () => {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.warn('SMTP settings are not fully configured. Email sending will be disabled.');
+    console.warn('SMTP settings are not fully configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS in backend/.env');
     return null;
   }
 
@@ -17,20 +20,25 @@ const createTransporter = () => {
   });
 };
 
-const transporter = createTransporter();
-
 const sendMail = async (to, subject, html) => {
+  const transporter = getTransporter();
   if (!transporter) {
-    console.warn('Email transport is not configured. Skipping email send:', subject);
-    return;
+    throw new Error('SMTP transport is not configured. Check backend/.env settings.');
   }
 
-  await transporter.sendMail({
+  await transporter.verify();
+
+  const info = await transporter.sendMail({
     from: process.env.SMTP_FROM || `Future Path <${process.env.SMTP_USER}>`,
     to,
     subject,
     html,
   });
+
+  console.log(`Email sent successfully to ${to} with subject: ${subject}`);
+  console.log('Nodemailer message ID:', info.messageId);
+
+  return info;
 };
 
 export const sendWelcomeEmail = async (user) => {
@@ -46,7 +54,7 @@ export const sendWelcomeEmail = async (user) => {
     </div>
   `;
 
-  await sendMail(user.email, 'Welcome to the Course Management System', html);
+  return sendMail(user.email, 'Welcome to the Course Management System', html);
 };
 
 export const sendEnrollmentEmail = async (user, course, registration) => {
@@ -71,5 +79,17 @@ export const sendEnrollmentEmail = async (user, course, registration) => {
     </div>
   `;
 
-  await sendMail(user.email, 'Course Enrollment Successful', html);
+  return sendMail(user.email, 'Course Enrollment Successful', html);
+};
+
+export const sendTestEmail = async (to) => {
+  const html = `
+    <div style="font-family: sans-serif; color: #1f2937;">
+      <h2>SMTP Test Email</h2>
+      <p>This is a test email from the Future Path Course Management System backend.</p>
+      <p>If you receive this message, SMTP is configured correctly.</p>
+    </div>
+  `;
+
+  return sendMail(to, 'SMTP Test Email - Course Management System', html);
 };

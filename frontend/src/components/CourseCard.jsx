@@ -20,10 +20,11 @@ const CourseCard = ({ course }) => {
   });
 
   const isFull = availableSeats <= 0;
-  const Wrapper = isFull ? 'div' : Link;
-  const wrapperProps = isFull
-    ? { className: 'glass-card flex flex-col h-full rounded-2xl overflow-hidden shadow-lg bg-slate-950/80' }
-    : { to: `/courses/${_id}`, className: 'glass-card flex flex-col h-full rounded-2xl overflow-hidden shadow-lg hover:shadow-indigo-500/10 group cursor-pointer' };
+  const Wrapper = Link;
+  const wrapperProps = {
+    to: `/courses/${_id}`,
+    className: `glass-card flex flex-col h-full rounded-2xl overflow-hidden shadow-lg hover:shadow-indigo-500/10 group cursor-pointer ${isFull ? 'bg-slate-950/80' : ''}`
+  };
 
   return (
     <Wrapper {...wrapperProps}>

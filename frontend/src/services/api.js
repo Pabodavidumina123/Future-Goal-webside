@@ -2,9 +2,6 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:5001/api', // Maps to backend port
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Interceptor to add Authorization Token on each request

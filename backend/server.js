@@ -114,6 +114,7 @@ const runAutoSeed = async () => {
             availableSeats: 45,
             instructor: {
               name: 'Prof. Janaka Perera',
+              role: 'Head of Computer Science Dept',
               email: 'janaka.perera@futurepath.example.com',
               phone: '+94 77 987 6543',
               bio: 'Janaka has over 15 years of experience in software engineering education and industry training.',
@@ -153,6 +154,7 @@ const runAutoSeed = async () => {
             availableSeats: 30,
             instructor: {
               name: 'Eng. Dilhani Silva',
+              role: 'Chartered Quantity Surveyor & Consultant',
               email: 'dilhani.silva@slti.example.com',
               phone: '+94 77 444 1122',
               bio: 'Dilhani is a chartered quantity surveyor with extensive Gulf and local project experience.',
@@ -192,6 +194,7 @@ const runAutoSeed = async () => {
             availableSeats: 25,
             instructor: {
               name: 'Dr. Kumara Wickramasinghe',
+              role: 'Consultant Medical Director',
               email: 'kumara.wickramasinghe@slha.example.com',
               phone: '+94 77 666 0033',
               bio: 'Dr. Kumara is an experienced healthcare educator and consultant with hospital leadership experience.',
@@ -231,6 +234,7 @@ const runAutoSeed = async () => {
             availableSeats: 50,
             instructor: {
               name: 'Mrs. Ruwanthi Jayasinghe',
+              role: 'Ex-Director of HR & MBA Lecturer',
               email: 'ruwanthi.jayasinghe@futurepath.example.com',
               phone: '+94 77 777 7788',
               bio: 'Ruwanthi is a business expert and former HR director who coaches students into management careers.',
@@ -270,6 +274,7 @@ const runAutoSeed = async () => {
             availableSeats: 35,
             instructor: {
               name: 'Dr. Asela Gunawardena',
+              role: 'Senior Data Scientist',
               email: 'asela.gunawardena@sl-data.example.com',
               phone: '+94 77 999 3344',
               bio: 'Asela is a senior data scientist and AI instructor with international research experience.',
@@ -309,6 +314,7 @@ const runAutoSeed = async () => {
             availableSeats: 40,
             instructor: {
               name: 'Mr. Samantha Alwis',
+              role: 'Founder of BrandBoost Agency',
               email: 'samantha.alwis@futurepath.example.com',
               phone: '+94 77 111 2233',
               bio: 'Samantha is a growth marketing strategist with multiple successful ecommerce launches.',

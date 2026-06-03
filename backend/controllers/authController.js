@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
-import { sendWelcomeEmail } from '../services/emailService.js';
+import { sendWelcomeEmail, sendTestEmail } from '../services/emailService.js';
 
 // Helper: Generate JWT token
 const generateToken = (id) => {
@@ -42,20 +42,48 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
+      console.log(`User registration completed: ${user.email} (${user._id})`);
+      let emailWarning = null;
+
       try {
+        console.log('Attempting to send welcome email to', user.email);
         await sendWelcomeEmail(user);
+        console.log('Welcome email sent successfully to', user.email);
       } catch (emailError) {
-        console.warn('Welcome email could not be sent:', emailError.message);
+        console.error('Welcome email failed for', user.email, emailError);
+        emailWarning = emailError.message;
       }
 
       res.status(201).json({
         ...formatUserResponse(user),
         token: generateToken(user._id),
+        emailStatus: emailWarning ? 'failed' : 'sent',
+        emailWarning,
       });
     } else {
       res.status(400).json({ success: false, message: 'Invalid user data' });
     }
   } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Send a manual SMTP test email
+// @route   POST /api/auth/test-email
+// @access  Public
+export const testEmailConnection = async (req, res) => {
+  try {
+    const to = req.body.email || process.env.SMTP_TEST_EMAIL || process.env.SMTP_USER;
+    if (!to) {
+      return res.status(400).json({ success: false, message: 'No test email address provided. Set SMTP_TEST_EMAIL or provide email in the request body.' });
+    }
+
+    console.log('Sending SMTP test email to', to);
+    await sendTestEmail(to);
+
+    res.json({ success: true, message: `Test email sent to ${to}.` });
+  } catch (error) {
+    console.error('SMTP test email failed:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -156,8 +184,11 @@ export const updateProfile = async (req, res) => {
 export const uploadProfileImage = async (req, res) => {
   try {
     if (!req.file) {
+      console.warn('No file uploaded by user:', req.user._id);
       return res.status(400).json({ success: false, message: 'No image file uploaded' });
     }
+
+    console.log(`Uploading profile image for user ${req.user._id}: ${req.file.filename} (${req.file.size} bytes)`);
 
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     const user = await User.findById(req.user._id);
@@ -168,8 +199,11 @@ export const uploadProfileImage = async (req, res) => {
     user.profileImage = imageUrl;
     await user.save();
 
+    console.log(`Profile image saved successfully for user ${req.user._id}: ${imageUrl}`);
+
     res.json({ success: true, profileImage: imageUrl, user: formatUserResponse(user) });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Profile upload error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Failed to upload profile image' });
   }
 };

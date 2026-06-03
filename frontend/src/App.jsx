@@ -6,9 +6,13 @@ import Register from './pages/Register';
 import Courses from './pages/Courses';
 import CourseDetails from './pages/CourseDetails';
 import StudentDashboard from './pages/StudentDashboard';
+import CourseDashboard from './pages/CourseDashboard';
 import Profile from './pages/Profile';
 import MyCourses from './pages/MyCourses';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminCourses from './pages/AdminCourses';
+import AdminAddCourse from './pages/AdminAddCourse';
+import AdminEditCourse from './pages/AdminEditCourse';
 import AdminContactRequests from './pages/AdminContactRequests';
 import Notifications from './pages/Notifications';
 import Navbar from './components/Layout/Navbar';
@@ -122,6 +126,16 @@ const App = () => {
             }
           />
           <Route
+            path="/dashboard/courses"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <CourseDashboard />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <ProtectedRoute>
@@ -159,6 +173,39 @@ const App = () => {
               <AdminRoute>
                 <AppLayout>
                   <AdminDashboard />
+                </AppLayout>
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/courses"
+            element={
+              <AdminRoute>
+                <AppLayout>
+                  <AdminCourses />
+                </AppLayout>
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/courses/add"
+            element={
+              <AdminRoute>
+                <AppLayout>
+                  <AdminAddCourse />
+                </AppLayout>
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/courses/edit/:id"
+            element={
+              <AdminRoute>
+                <AppLayout>
+                  <AdminEditCourse />
                 </AppLayout>
               </AdminRoute>
             }

@@ -27,6 +27,7 @@ const CourseForm = ({ course, mode = 'add', onSuccess }) => {
     endDate: '',
     schedule: '',
     location: '',
+    totalSeats: '',
     availableSeats: '',
     requirementsText: '',
     learningOutcomesText: '',
@@ -61,6 +62,7 @@ const CourseForm = ({ course, mode = 'add', onSuccess }) => {
         endDate: course.endDate ? new Date(course.endDate).toISOString().slice(0, 10) : '',
         schedule: course.schedule || '',
         location: course.location || '',
+        totalSeats: course.totalSeats || '',
         availableSeats: course.availableSeats || '',
         requirementsText: (course.requirements || []).join(', '),
         learningOutcomesText: (course.learningOutcomes || []).join(', '),
@@ -132,6 +134,11 @@ const CourseForm = ({ course, mode = 'add', onSuccess }) => {
       return;
     }
 
+    if (Number(formValues.availableSeats) > Number(formValues.totalSeats)) {
+      triggerToast('Available seats cannot exceed total seats.', 'error');
+      return;
+    }
+
     const payload = {
       title: formValues.title,
       category: formValues.category,
@@ -148,6 +155,7 @@ const CourseForm = ({ course, mode = 'add', onSuccess }) => {
       endDate: formValues.endDate,
       schedule: formValues.schedule,
       location: formValues.location,
+      totalSeats: Number(formValues.totalSeats),
       availableSeats: Number(formValues.availableSeats),
       requirements: formValues.requirementsText.split(',').map((item) => item.trim()).filter(Boolean),
       learningOutcomes: formValues.learningOutcomesText.split(',').map((item) => item.trim()).filter(Boolean),
@@ -291,14 +299,18 @@ const CourseForm = ({ course, mode = 'add', onSuccess }) => {
             </label>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-slate-400">Total Seats *</span>
+              <input type="number" min="1" value={formValues.totalSeats} onChange={handleChange('totalSeats')} placeholder="E.g. 50" className="mt-2 block w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-indigo-500" required />
+            </label>
             <label className="block">
               <span className="text-xs uppercase tracking-widest text-slate-400">Available Seats *</span>
-              <input type="number" value={formValues.availableSeats} onChange={handleChange('availableSeats')} placeholder="E.g. 30" className="mt-2 block w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-indigo-500" />
+              <input type="number" min="0" value={formValues.availableSeats} onChange={handleChange('availableSeats')} placeholder="E.g. 30" className="mt-2 block w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-indigo-500" required />
             </label>
             <label className="block">
               <span className="text-xs uppercase tracking-widest text-slate-400">Instructor Role *</span>
-              <input value={formValues.instructorRole} onChange={handleChange('instructorRole')} placeholder="E.g. Head of Department" className="mt-2 block w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-indigo-500" />
+              <input value={formValues.instructorRole} onChange={handleChange('instructorRole')} placeholder="E.g. Head of Department" className="mt-2 block w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-200 outline-none focus:border-indigo-500" required />
             </label>
           </div>
 
@@ -370,8 +382,8 @@ const CourseForm = ({ course, mode = 'add', onSuccess }) => {
                   <strong>{formValues.category}</strong>
                 </div>
                 <div className="flex justify-between items-center rounded-2xl bg-slate-900/60 px-4 py-3">
-                  <span>Seats</span>
-                  <strong>{formValues.availableSeats || '0'}</strong>
+                  <span>Seats (Available / Total)</span>
+                  <strong>{(formValues.availableSeats || '0') + ' / ' + (formValues.totalSeats || '0')}</strong>
                 </div>
                 <div className="flex justify-between items-center rounded-2xl bg-slate-900/60 px-4 py-3">
                   <span>Status</span>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import CourseCard from '../components/CourseCard';
 import Spinner from '../components/Common/Spinner';
 import Toast from '../components/Common/Toast';
 import { GraduationCap, Clock, CheckCircle2, XCircle, Calendar, CreditCard, Bell, Inbox } from 'lucide-react';
@@ -9,7 +10,10 @@ import { Link } from 'react-router-dom';
 const StudentDashboard = () => {
   const { user } = useAuth();
   const [registrations, setRegistrations] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [courseError, setCourseError] = useState(null);
   const [toastMsg, setToastMsg] = useState(null);
   const [toastType, setToastType] = useState('success');
 
@@ -32,8 +36,24 @@ const StudentDashboard = () => {
     }
   };
 
+  const fetchFeaturedCourses = async () => {
+    setCoursesLoading(true);
+    setCourseError(null);
+    try {
+      const res = await api.get('/courses?status=Active&page=1&pageSize=6');
+      if (res.data.success) {
+        setCourses(res.data.courses);
+      }
+    } catch (err) {
+      setCourseError(err.response?.data?.message || 'Unable to load courses.');
+    } finally {
+      setCoursesLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchStudentDashboardData();
+    fetchFeaturedCourses();
   }, []);
 
   // Compute metrics
@@ -150,6 +170,45 @@ const StudentDashboard = () => {
             <span className="text-xl font-extrabold text-white mt-1">{pendingCount}</span>
           </div>
         </div>
+      </div>
+
+      {/* Featured Courses Section */}
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-slate-100">Explore Courses</h2>
+            <p className="text-sm text-slate-400">Browse the latest available programs with course images, duration, fee and seat availability.</p>
+          </div>
+          <Link
+            to="/courses"
+            className="inline-flex items-center gap-2 rounded-3xl bg-indigo-600 px-4 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-indigo-500"
+          >
+            View Full Catalog
+          </Link>
+        </div>
+
+        {coursesLoading ? (
+          <div className="py-24">
+            <Spinner size="large" />
+          </div>
+        ) : courseError ? (
+          <div className="glass-panel rounded-3xl border border-slate-900 p-8 text-center text-rose-400">
+            <h3 className="text-base font-bold">Unable to load courses</h3>
+            <p className="text-xs text-slate-500 mt-2">{courseError}</p>
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="glass-panel rounded-3xl border border-slate-900 p-12 text-center text-slate-400">
+            <Inbox className="h-10 w-10 text-slate-500 mx-auto mb-4" />
+            <h3 className="text-base font-bold text-slate-200">No courses available</h3>
+            <p className="text-xs text-slate-500 mt-2">Check back later or contact an administrator for updates.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {courses.map((course) => (
+              <CourseCard key={course._id} course={course} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Main Registrations Section */}

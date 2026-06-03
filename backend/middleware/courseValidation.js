@@ -15,6 +15,7 @@ export const validateCourseInput = (req, res, next) => {
     endDate,
     schedule,
     location,
+    totalSeats,
     availableSeats,
     requirements,
     learningOutcomes,
@@ -44,7 +45,16 @@ export const validateCourseInput = (req, res, next) => {
   if (new Date(startDate) > new Date(endDate)) errors.push('Course end date must be after start date');
   if (!schedule || !schedule.trim()) errors.push('Course schedule is required');
   if (!location || !location.trim()) errors.push('Course location is required');
-  if (!availableSeats || Number.isNaN(Number(availableSeats))) errors.push('Available seats is required and must be a number');
+
+  if (totalSeats === undefined || totalSeats === null || Number.isNaN(Number(totalSeats)) || Number(totalSeats) < 1) {
+    errors.push('Total seats is required and must be at least 1');
+  }
+  if (availableSeats === undefined || availableSeats === null || Number.isNaN(Number(availableSeats)) || Number(availableSeats) < 0) {
+    errors.push('Available seats is required and must be a non-negative number');
+  } else if (Number(availableSeats) > Number(totalSeats)) {
+    errors.push('Available seats cannot exceed total seats');
+  }
+
   if (!Array.isArray(learningOutcomes) || learningOutcomes.length === 0) errors.push('At least one learning outcome is required');
   if (!Array.isArray(requirements) || requirements.length === 0) errors.push('At least one requirement is required');
   if (!status || !['Active', 'Inactive'].includes(status)) errors.push('Course status is required');
@@ -72,6 +82,7 @@ export const validateCourseInput = (req, res, next) => {
   }
 
   req.body.fee = Number(fee);
+  req.body.totalSeats = Number(totalSeats);
   req.body.availableSeats = Number(availableSeats);
   req.body.startDate = new Date(startDate);
   req.body.endDate = new Date(endDate);

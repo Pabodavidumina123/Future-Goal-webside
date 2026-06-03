@@ -44,8 +44,9 @@ const upload = multer({
 
 router.post('/upload', protect, adminOnly, upload.single('image'), uploadCourseImage);
 
+// Public: listing courses should be accessible without authentication
 router.route('/')
-  .get(protect, getCourses)
+  .get(getCourses)
   .post(protect, adminOnly, validateCourseInput, createCourse);
 
 router.route('/:id')

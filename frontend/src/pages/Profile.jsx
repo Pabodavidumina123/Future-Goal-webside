@@ -40,8 +40,8 @@ const Profile = () => {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      triggerToast('Profile photo must be smaller than 2MB.', 'error');
+    if (file.size > 5 * 1024 * 1024) {
+      triggerToast('Profile photo must be smaller than 5MB.', 'error');
       return;
     }
 
@@ -60,15 +60,15 @@ const Profile = () => {
         const formData = new FormData();
         formData.append('profileImage', photoFile);
 
-        const uploadRes = await api.post('/auth/profile/photo', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const uploadRes = await api.post('/auth/profile/photo', formData);
 
-        if (uploadRes.data.success) {
-          updatedProfile = { ...updatedProfile, profileImage: uploadRes.data.profileImage };
-          setProfileImage(uploadRes.data.profileImage);
-          triggerToast('Profile photo uploaded successfully.');
+        if (!uploadRes.data.success) {
+          throw new Error(uploadRes.data.message || 'Profile photo upload failed.');
         }
+
+        updatedProfile = { ...updatedProfile, profileImage: uploadRes.data.profileImage };
+        setProfileImage(uploadRes.data.profileImage);
+        triggerToast('Profile photo uploaded successfully.');
       }
 
       const profileRes = await api.put('/auth/profile', { name, email, phone });
@@ -81,7 +81,8 @@ const Profile = () => {
         triggerToast('Profile updated successfully.');
       }
     } catch (error) {
-      triggerToast(error.response?.data?.message || 'Unable to update profile.', 'error');
+      console.error('Profile update error:', error);
+      triggerToast(error.response?.data?.message || error.message || 'Unable to update profile.', 'error');
     } finally {
       setLoading(false);
     }
@@ -177,7 +178,7 @@ const Profile = () => {
                   </div>
                   <div className="space-y-1 text-slate-400 text-xs">
                     <p className="text-slate-200">Upload a JPEG, PNG, or WEBP image.</p>
-                    <p>Max size 2MB.</p>
+                    <p>Max size 5MB.</p>
                   </div>
                 </div>
                 <input
